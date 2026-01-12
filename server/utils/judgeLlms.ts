@@ -206,11 +206,27 @@ async function callLLM(
     The JSON structure is:
     {
       ${escapedJsonSchema},
-      "description": "<A neutral, structured justification explaining the scores. The description MUST reference:
-        1. How the submission performed on each criterion (Interpretation, Translation, Prompt Design),
-        2. How each rubric sub-section influenced the scoring (e.g., Original Insight, Emotional & Cultural Depth, Meaning over Description),
-        3. How well the submission responded to both Problem Statement and Visual Clues inside the CHALLENGE CONTEXT string,
-        without revealing internal step-by-step reasoning or chain-of-thought.>"
+      "description": "<A neutral, structured justification explaining the scores. 
+      
+      CRITICAL REQUIREMENT - SUB-CRITERIA SCORE BREAKDOWN:
+      If any rubric criterion contains sub-sections (indicated by weights like 33%, 34%, etc. or explicit sub-points), 
+      you MUST provide EXPLICIT NUMERICAL SCORES for each sub-section in the description.
+      
+      Format for each main criterion:
+      [Criterion Name] ([Score]/100): [Brief overview]. [Sub-criterion 1 Name] ([sub-score]/[max-points]): [justification]. [Sub-criterion 2 Name] ([sub-score]/[max-points]): [justification]. [Continue for all sub-criteria].
+      
+      Example format:
+      VIN Interpretation (92/100): The submission demonstrates exceptional Original Insight (32/33) by [justification]. The Emotional and Cultural Depth (31/33) is strong because [justification]. The Meaning over Description (29/34) excels by [justification].
+      
+      The description MUST:
+      1. For EACH main criterion, provide the overall score (e.g., 92/100)
+      2. For EACH sub-criterion within that main criterion, provide its individual score (e.g., 32/33, 31/33, 29/34)
+      3. Explain how the submission performed on each sub-criterion
+      4. Reference how the submission addressed both Problem Statement and Guidelines
+      5. Maintain a neutral, objective tone without revealing internal chain-of-thought reasoning
+      
+      DO NOT provide only narrative explanation without numerical breakdowns for sub-criteria.
+      DO NOT skip sub-criteria score breakdowns even if the explanation is detailed.>"
     }
     </output_format>
     `.trim();
@@ -414,9 +430,13 @@ Your evaluation must be objective, consistent, and strictly adhere to the provid
 
 <evaluation_process>
 1.  **Analyze the Problem Statement**: This is the ground truth. Understand its core requirements, constraints, and objectives.
-2.  **Deconstruct the Rubric**: For each criterion, understand its definition and what constitutes a high-quality submission for that specific dimension.
-3.  **Evaluate the Submission**: Critically assess the student's prompt (the "answer"). For each rubric criterion, systematically compare the submission against the problem statement.
-4.  **Assign a Score**: For each criterion, assign an integer score from 0-100 based *only* on how well the submission meets the requirements. Use the scoring guide below.
+2.  **Deconstruct the Rubric**: For each criterion, understand its definition and what constitutes a high-quality submission for that specific dimension. If a criterion has sub-sections with weights, you MUST evaluate and score each sub-section individually.
+3.  **Evaluate the Submission**: Critically assess the student's prompt (the "answer"). For each rubric criterion, systematically compare the submission against the problem statement. If the criterion has sub-sections, evaluate each one separately.
+4.  **Assign Scores**: 
+    a. For each main criterion, assign an integer score from 0-100 based on how well the submission meets the requirements.
+    b. For each sub-criterion (if present), calculate its individual score proportional to its weight and include it in the description.
+    c. Use the scoring guide below for both main and sub-criteria.
+5.  **Document Sub-Criteria Scores**: In your description, you MUST explicitly state the score for each sub-criterion using the format: [Sub-criterion Name] ([score]/[max-points])
 </evaluation_process>
 
 <scoring_guide>
@@ -441,7 +461,15 @@ Do not include any text, explanations, or markdown formatting before or after th
 The JSON structure is:
 {
   ${escapedJsonSchema},
-  "description": "<A 3-5 sentence, neutral justification for your scores, summarizing the submission's strengths and weaknesses.>"
+  "description": "<A comprehensive, structured justification for your scores.
+  
+  MANDATORY FORMAT - If rubric criteria contain sub-sections:
+  For each main criterion, state: [Criterion Name] ([Score]/100): [Overview]. Then for EACH sub-criterion: [Sub-criterion Name] ([sub-score]/[max-points]): [specific justification].
+  
+  Example:
+  VIN Interpretation (92/100): Strong performance overall. Original Insight (32/33): Exceptional metaphorical transformation. Emotional and Cultural Depth (31/33): Strong cultural contextualization. Meaning over Description (29/34): Excellent depth of meaning.
+  
+  You MUST include numerical scores for all sub-criteria. Narrative-only explanations without score breakdowns are NOT acceptable.>"
 }
 </output_format>
 `.trim();
