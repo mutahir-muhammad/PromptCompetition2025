@@ -19,7 +19,10 @@ export async function runJudges(prompt: string,
 
   const rubricArray = rubric;
   const DEFAULT_SYSTEM_PROMPT = createSystemPrompt(rubricArray)
-  let systemPrompt = competitionSystemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+  // let systemPrompt = competitionSystemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+  // bypassing the system level prompt for now to have more control
+  let systemPrompt = challengeSystemPrompt ?? competitionSystemPrompt ?? DEFAULT_SYSTEM_PROMPT;
+
 
   
   // Log system prompt for verification
@@ -161,7 +164,6 @@ async function callLLM(
   prompt: string, 
   problemStatement: string,
   guidelines: string,
-  challengeSystemPrompt: string,
   apiKey: string,
   rubricArray: any[],
   maxTokens: number,
