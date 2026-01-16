@@ -31,7 +31,7 @@ export async function runJudges(prompt: string,
   // Run all models in parallel with individual configurations
   const results = await Promise.all(
     MODELS.map(({ model, maxTokens, temperature }) => 
-      evaluateWithRetry(model, prompt, systemPrompt, rubricArray, problemStatement, guidelines, challengeSystemPrompt, apiKey, maxTokens, temperature)
+      evaluateWithRetry(model, prompt, systemPrompt, rubricArray, problemStatement, guidelines, apiKey, maxTokens, temperature)
     )
   );
 
@@ -48,7 +48,6 @@ async function evaluateWithRetry(
   rubricArray: any[],
   problemStatement: string,
   guidelines: string,
-  challengeSystemPrompt: string,
   apiKey: string,
   maxTokens: number,
   temperature: number
@@ -69,7 +68,6 @@ async function evaluateWithRetry(
         prompt,
         problemStatement,
         guidelines,
-        challengeSystemPrompt,
         apiKey,
         rubricArray,
         maxTokens,
